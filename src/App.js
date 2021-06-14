@@ -196,7 +196,7 @@ function App() {
               tokens: JSON.stringify(tokens),
               expireToken: _currentSession.getIdToken().getExpiration(),
               expire:
-                session.getIdToken().getIssuedAt() +
+                _currentSession.getIdToken().getIssuedAt() +
                 REFRESH_TOKEN_EXPIRY * 24 * 60 * 60,
             });
             console.log("SESSION ", prifinaSession);
