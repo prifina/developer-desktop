@@ -35,7 +35,8 @@
     "short-uuid": "^4.1.0",
     "styled-components": "^5.2.0",
     "styled-system": "^5.1.5",
-    "uuid": "^8.3.1"
+    "uuid": "^8.3.1",
+    "demo-blend-ui": "^0.0.9"
   },
   "scripts": {
     "start": "react-scripts start",
