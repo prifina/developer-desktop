@@ -7,41 +7,61 @@ import {
   ModalHeader,
   ModalFooter,
 } from "@blend-ui/modal";
-import { Box, Button, Text, Flex, useTheme, Input } from "@blend-ui/core";
+import {
+  Box,
+  Button,
+  Text,
+  Flex,
+  useTheme,
+  Input,
+  Image,
+} from "@blend-ui/core";
+
+import styled from "styled-components";
 
 import { Radio, checkAction } from "demo-blend-ui/core";
+import { BlendIcon } from "@blend-ui/icons";
+
+import cardPrifinaLogo from "../assets/cardPrifinaLogo.png";
+
+import bxsInfoCircle from "@iconify/icons-bx/bxs-info-circle";
 
 import PropTypes from "prop-types";
 import i18n from "../lib/i18n";
+import { justifySelf } from "styled-system";
 i18n.init();
+
+const StyledBox = styled(Box)`
+  height: 129px;
+  width: 331px;
+  border-radius: 5px;
+  align-items: center;
+  z-index: 1;
+  border: null;
+  // background: linear-gradient(180deg, #aa076b 0%, #61045f 100%);
+  // background-image: url(${cardPrifinaLogo});
+  background: url(${cardPrifinaLogo}),
+    linear-gradient(180deg, #aa076b 0%, #61045f 100%);
+  background-repeat: no-repeat;
+  background-position: right center;
+`;
+
+// width = "331px";
+// height = "129px";
+// bg = "#61045F";
+// borderRadius = "5px";
+// alignItems = "center";
 
 const CreateProjectModal = ({ onClose, onButtonClick, ...props }) => {
   const theme = useTheme();
 
   const [dialogOpen, setDialogOpen] = useState(true);
 
-  
-
   const onCloseCheck = (e, action) => {
     console.log("MODAL CLOSE ", e, action);
     onClose(e, action);
     e.preventDefault();
   };
-
-  //////radio
-  // const checkAction = e => {
-  //   console.log("CLICK ", e, e.target);
-  //   action(`${e.target.id} was clicked`)(e.target.value, e.target.checked);
-  // };
-
-  /*
-  <div
-  style={{ fontSize: "18px", lineHeight: "24px", fontWeight: 600 }}
->
-  Title
-</div>
-
-*/
 
   return (
     <React.Fragment>
@@ -85,7 +105,8 @@ const CreateProjectModal = ({ onClose, onButtonClick, ...props }) => {
                     fontSize="14px"
                     onClick={checkAction}
                     color="#AA1370"
-                    colorStyle={{ color: "white" }}
+styl
+                    textStyle={{ color: "white" }}
                   >
                     Widget
                   </Radio>
@@ -104,33 +125,32 @@ const CreateProjectModal = ({ onClose, onButtonClick, ...props }) => {
                 <Input width="361px" placeholder="Sleep Tracker" />
               </Box>
               <Box paddingLeft="46px">
-                <Flex
-                  width="331px"
-                  height="129px"
-                  bg="#61045F"
-                  borderRadius="5px"
-                  alignItems="center"
-                >
-                  {/* <Image
-                    src={src}
-                    height="65px"
-                    width="55px"
-                    marginLeft="-12px"
-                    position="absolute"
-                  /> */}
-                  <Box paddingLeft="26px">
-                    <Text color="white" fontSize={16} paddingBottom="5px">
-                      Prifina app ID
-                    </Text>
+                <StyledBox>
+                  <Box paddingLeft="16px" paddingTop="10px">
+                    <Flex>
+                      <BlendIcon
+                        iconify={bxsInfoCircle}
+                        color={"#580F57"}
+                        size={"20"}
+                      />
+                      <Text
+                        color="white"
+                        fontSize={16}
+                        paddingBottom="5px"
+                        paddingLeft="8px"
+                      >
+                        Prifina app ID
+                      </Text>
+                    </Flex>
                     <Text color="#ADADAD" fontSize={12}>
                       This unique identifer is needed to connect your
                       application to prifina.
                     </Text>
-                    <Text color="#ADADAD" fontSize={12}>
+                    <Text color="#ADADAD" fontSize={12} paddingTop="7px">
                       Copy it and add it to your build.
                     </Text>
                   </Box>
-                </Flex>
+                </StyledBox>
                 <Text
                   color="#ADADAD"
                   fontSize={12}
