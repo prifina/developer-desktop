@@ -29,7 +29,7 @@ import docs from "../assets/docs.png";
 import starterResources from "../assets/starterResources.png";
 import launcherResources from "../assets/launcherResources.png";
 import slackResources from "../assets/slackResources.png";
-import table from "../assets/table.png";
+import widget from "../assets/Widget.png";
 
 const APIConfig = {
   aws_appsync_graphqlEndpoint: config.appSync.aws_appsync_graphqlEndpoint,
@@ -165,69 +165,19 @@ export const Sandbox = props => {
     default:
   }
 
-  const onCloseCheck = (e, action) => {
-    console.log("MODAL CLOSE ", e, action);
-    onClose(e, action);
-    e.preventDefault();
-  };
+  // const [ccolor, setColor] = useState("black");
 
-  const Navbar = () => {
-    return (
-      <Flex
-        height="74px"
-        bg="#08011C"
-        style={{ position: "sticky", top: 0, zIndex: 1 }}
-      ></Flex>
-    );
-  };
-  const UserMenu = () => {
-    return (
-      <Flex
-        height="100%"
-        flexDirection="column"
-        width="288px"
-        position="fixed"
-        bg="#08011C"
-        zIndex={1}
-        alignItems="center"
-        paddingTop={25}
-      />
-    );
-  };
+  // constructor(props){
+  //   super(props);
+  //   this.state = { color: green };
+  //   this.changeColor = this.changeColor.bind(this);
+  // };
 
-  const ResourceCard = ({ title, description, src }) => {
-    return (
-      <Flex
-        width="238px"
-        height="120px"
-        bg="#08011C"
-        borderRadius="5px"
-        alignItems="center"
-      >
-        <Image
-          src={src}
-          height="65px"
-          width="55px"
-          marginLeft="-12px"
-          position="absolute"
-        />
-        <Box paddingLeft="26px">
-          <Text color="white" fontSize={16} paddingBottom="5px">
-            {title}
-          </Text>
-          <Text color="#ADADAD" fontSize={12}>
-            {description}
-          </Text>
-        </Box>
-      </Flex>
-    );
-  };
-  const bg = "#1D152C";
+  const [color, setColor] = useState("black");
 
-  const [toggle, setToggle] = React.useState(bg);
-  const toggleIt = () => {
-    bg = "white";
-    setToggle(!toggle);
+  const changeColor = () => {
+    const newColor = color == "black" ? "white" : "black";
+    setColor(newColor);
   };
 
   return (
@@ -269,23 +219,48 @@ export const Sandbox = props => {
       <Flex
         height="48px"
         width="100%"
-        bg="#61045F
-"
-      ></Flex>
-      <Flex height="48px" width="100%" bg={bg}>
-        {/* <Button size="xs" onClick={toggleIt}>
+        bg="#61045F"
+        alignItems="center"
+        justifyContent="center"
+      >
+        <Text color="white" fontSize={16}>
+          This is a live Sandbox session you are seeing how your project will
+          render in Prifina
+        </Text>
+      </Flex>
+      <Flex
+        height="64px"
+        width="100%"
+        bg="#1D152C"
+        justifyContent="flex-end"
+        alignItems="center"
+        paddingRight="67px"
+      >
+        <Text color="#F5F8F7" paddingRight="16px">
+          Let there be light
+        </Text>
+
+        <Button
+          size="xs"
+          onClick={() => {
+            changeColor();
+          }}
+        >
           Switch
-        </Button> */}
+        </Button>
       </Flex>
       <Flex
         width="100%"
         height="718px"
-        paddingLeft="288px"
-        paddingTop="30px"
-        bg="#141020"
-        // justifyContent="center"
+        // paddingLeft="288px"
+        // paddingTop="30px"
+        bg={color}
+        justifyContent="center"
+        alignItems="center"
         flexDirection="column"
-      ></Flex>
+      >
+        <Image src={widget} width="308px" height="295px" />
+      </Flex>
     </ThemeProvider>
   );
 };
