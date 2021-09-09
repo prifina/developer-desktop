@@ -72,3 +72,31 @@ export const installWidget = `mutation addInstalledWidget($id:String!,$widget:Wi
 export const addPrifinaSession = `mutation addSession($input:SessionInput) {
   addSession(input: $input)
 }`;
+
+export const updateUserProfile = `mutation updateUserProfile($id:String!, $profile:AWSJSON) {
+  updateUserProfile(id:$id,profile:$profile) {
+    appProfile
+    id
+  }
+}`;
+
+export const newAppVersion = `mutation newAppVersion($id:String!, $prifinaId:String!,$name:String,$title:String, $version:String,$appType:Int!) {
+  newAppVersion(id:$id,prifinaId:$prifinaId,name:$name,title:$title,version:$version,appType:$appType) {
+    appType
+    id
+    identity
+    identityPool
+    name
+    prifinaId
+  }
+}`;
+
+export const addAppVersion = `mutation addAppVersion($input:AppVersionInput) {
+  addAppVersion(input: $input) {
+    appType
+    id
+    name
+    version
+    nextVersion  
+  }
+}`;

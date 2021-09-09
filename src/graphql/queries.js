@@ -119,6 +119,23 @@ export const getPrifinaSession = `query getSession($tracker: String!) {
   }
 }`;
 
+export const listApps = `query appsList($filter:TableAppsFilterInput,$sortDirection:String,$limit:Int,$nextToken:String) {
+  listApps(filter: $filter, limit: $limit, nextToken: $nextToken,sortDirection:$sortDirection) {
+    items {
+      id
+      name
+      title
+      nextVersion
+      modifiedAt
+      createdAt
+      status
+      appType
+      version
+    }
+    nextToken
+  }
+}`;
+
 /*
 
 query MyQuery {

@@ -22,7 +22,7 @@ const prod = {
     aws_appsync_authenticationType: process.env.REACT_APP_APPSYNC_AUTH_TYPE,
   },
   S3: {
-    bucket: "prifina-app-data-dev",
+    bucket: "prifina-data-352681697435",
     region: "us-east-1",
   },
 };
@@ -45,7 +45,7 @@ const dev = {
     aws_appsync_authenticationType: process.env.REACT_APP_APPSYNC_AUTH_TYPE,
   },
   S3: {
-    bucket: "prifina-app-data-dev",
+    bucket: "prifina-data-352681697435",
     region: "us-east-1",
   },
 };

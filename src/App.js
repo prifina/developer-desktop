@@ -10,7 +10,7 @@ import { API, Auth } from "aws-amplify";
 import { ThemeProvider, baseStyles } from "@blend-ui/core";
 import { createGlobalStyle } from "styled-components";
 
-import config from "./config";
+import config, { REFRESH_TOKEN_EXPIRY } from "./config";
 
 import sha512 from "crypto-js/sha512";
 import Base64 from "crypto-js/enc-base64";
@@ -192,6 +192,7 @@ function App() {
             console.log("UPDATE SESSION...");
 
             const prifinaSession = await addPrifinaSessionMutation(API, {
+              identityPool: Auth._config.identityPoolId,
               tracker: tracker,
               tokens: JSON.stringify(tokens),
               expireToken: _currentSession.getIdToken().getExpiration(),
@@ -210,6 +211,13 @@ function App() {
         });
       } catch (e) {
         console.log("ERR ", e);
+        /*
+        add this error 
+        code: "NotAuthorizedException"
+        message: "Refresh Token has expired"
+        name: "NotAuthorizedException"
+        */
+
         if (typeof e === "string" && e === "No current user") {
           const prifinaSession = await getPrifinaSessionQuery(API, tracker);
           console.log("AUTH SESSION ", prifinaSession);

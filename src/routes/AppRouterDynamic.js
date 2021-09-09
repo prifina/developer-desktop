@@ -7,6 +7,10 @@ import AuthenticatedRoute from "./AuthenticatedRoute";
 import UnauthenticatedRoute from "./UnauthenticatedRoute";
 const Home = React.lazy(() => import("../pages/Home"));
 const Logout = React.lazy(() => import("../pages/Logout"));
+const Admin = React.lazy(() => import("../pages/Admin"));
+const NewApp = React.lazy(() => import("../pages/NewApp"));
+
+const UploadApp = React.lazy(() => import("../components/UploadApp"));
 
 import Landing from "../pages/Landing";
 
@@ -21,6 +25,15 @@ export default props => (
         <Home />
       </AppliedRoute>
       */}
+      <AuthenticatedRoute path="/upload" exact>
+        <UploadApp />
+      </AuthenticatedRoute>
+      <AuthenticatedRoute path="/new-app" exact>
+        <NewApp />
+      </AuthenticatedRoute>
+      <AuthenticatedRoute path="/admin" exact>
+        <Admin />
+      </AuthenticatedRoute>
       <AuthenticatedRoute path="/test" exact>
         <Landing />
       </AuthenticatedRoute>

@@ -3,16 +3,24 @@
 
 import React, { useRef, useState, useEffect } from "react";
 
-import Amplify, { Auth, API as GRAPHQL } from "aws-amplify";
-import config from "../config";
+import { Auth, API as GRAPHQL } from "aws-amplify";
+
+import config, { REFRESH_TOKEN_EXPIRY } from "../config";
 
 import AWSAppSyncClient, { AUTH_TYPE } from "aws-appsync";
 
-import { getPrifinaUserQuery } from "../graphql/api";
+import {
+  getPrifinaUserQuery,
+  updateUserProfileMutation,
+  getPrifinaSessionQuery,
+} from "../graphql/api";
 
 import { default as DefaultApp } from "../pages/Home";
 
 import { useFormFields } from "../lib/formFields";
+
+import sha512 from "crypto-js/sha512";
+import Base64 from "crypto-js/enc-base64";
 
 const APIConfig = {
   aws_appsync_graphqlEndpoint: config.appSync.aws_appsync_graphqlEndpoint,
@@ -53,9 +61,13 @@ export const defaultApp = props => {
     password: "",
   });
 
+  const refreshSession = useRef(false);
+
   Auth.configure(AUTHConfig);
-  Amplify.configure(APIConfig);
-  Amplify.configure(S3Config);
+  GRAPHQL.configure(APIConfig);
+
+  //Amplify.configure(APIConfig);
+  //Amplify.configure(S3Config);
   console.log("AUTH CONFIG ", AUTHConfig);
 
   const createClient = (endpoint, region) => {
@@ -80,6 +92,21 @@ export const defaultApp = props => {
 
   // get user auth...
   useEffect(async () => {
+    let _currentUser = {};
+    const tracker = Base64.stringify(sha512(window.deviceFingerPrint));
+    const lastAuthUser = localStorage.getItem(
+      "CognitoIdentityServiceProvider." +
+        config.cognito.APP_CLIENT_ID +
+        ".LastAuthUser",
+    );
+    const currentIdToken = localStorage.getItem(
+      "CognitoIdentityServiceProvider." +
+        config.cognito.APP_CLIENT_ID +
+        "." +
+        lastAuthUser +
+        ".idToken",
+    );
+
     try {
       if (login) {
         const session = await Auth.currentSession();
@@ -89,6 +116,7 @@ export const defaultApp = props => {
           console.log("NO CURRENT SESSION FOUND");
         }
         console.log("PRIFINA-ID", session.idToken.payload["custom:prifina"]);
+        /*
         prifinaID.current = session.idToken.payload["custom:prifina"];
 
         const currentPrifinaUser = await getPrifinaUserQuery(
@@ -103,6 +131,26 @@ export const defaultApp = props => {
         );
         console.log("CURRENT USER ", appProfile, appProfile.initials);
 
+        let clientEndpoint = "";
+        let clientRegion = "";
+        if (!appProfile.hasOwnProperty("endpoint")) {
+          const defaultProfileUpdate = await updateUserProfileMutation(
+            API,
+            currentUser.prifinaID,
+          );
+          console.log("PROFILE UPDATE ", defaultProfileUpdate);
+          appProfile = JSON.parse(
+            defaultProfileUpdate.data.updateUserProfile.appProfile,
+          );
+        }
+        clientEndpoint = appProfile.endpoint;
+        clientRegion = appProfile.region;
+
+        const client = createClient(clientEndpoint, clientRegion);
+        clientHandler.current = client;
+        setSettingsReady(true);
+        */
+        /*  
         let clientEndpoint =
           "https://kxsr2w4zxbb5vi5p7nbeyfzuee.appsync-api.us-east-1.amazonaws.com/graphql";
         let clientRegion = "us-east-1";
@@ -114,10 +162,34 @@ export const defaultApp = props => {
         clientHandler.current = createClient(clientEndpoint, clientRegion);
 
         setSettingsReady(true);
+        */
       }
     } catch (e) {
       if (typeof e === "string" && e === "No current user") {
-        setLogin(false);
+        const prifinaSession = await getPrifinaSessionQuery(GRAPHQL, tracker);
+        console.log("AUTH SESSION ", prifinaSession);
+        if (prifinaSession.data.getSession === null) {
+          localStorage.removeItem("LastSessionIdentityPool");
+          refreshSession.current = true;
+          console.log("NO SSO SESSION FOUND");
+        } else {
+          let tokens = JSON.parse(prifinaSession.data.getSession.tokens);
+          Object.keys(tokens).forEach(key => {
+            localStorage.setItem(key, tokens[key]);
+          });
+          //CognitoIdentityId-us-east-1:27d0bb9c-b563-497b-ad0f-82b0ceb9eb0c
+          localStorage.setItem(
+            "LastSessionIdentityPool",
+            prifinaSession.data.getSession.identityPool,
+          );
+
+          console.log("AUTH OBJ ", Auth);
+          window.location.reload();
+        }
+      }
+
+      if (typeof e === "string" && e === "No current user") {
+        //setLogin(false);
         //const user = await Auth.signIn("tahola", "xxxx");
         //console.log("AUTH ", user);
         //console.log("APP DEBUG ", appCode);

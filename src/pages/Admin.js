@@ -1,30 +1,22 @@
-/* eslint-disable react/display-name */
 /* eslint-disable react/forbid-prop-types */
 /* eslint-disable react/no-multi-comp */
 /* global localStorage */
 
 import React, { useEffect, useReducer, useState, useRef } from "react";
-
-import { Box, Flex, Text, Button } from "@blend-ui/core";
+//import { useTheme } from "@blend-ui/core";
+import { Box, Flex, Text } from "@blend-ui/core";
 import { useIsMountedRef } from "../lib/componentUtils";
 
 import { useAppContext } from "../lib/contextLib";
 import { API, Auth } from "aws-amplify";
 import { useHistory } from "react-router-dom";
 
-import { StyledBox } from "../components/DefaultBackground";
-import { PrifinaLogo } from "../components/PrifinaLogo";
-
-import { listAppsQuery, addAppVersionMutation } from "../graphql/api";
-
-import withUsermenu from "../components/UserMenu";
+import { listAppsQuery } from "../graphql/api";
 
 import styled from "styled-components";
 import { useTable } from "react-table";
 
 import PropTypes from "prop-types";
-
-import UploadApp from "../components/UploadApp";
 
 const TableStyles = styled.div`
   /* This is required to make the table full-width */
@@ -70,9 +62,53 @@ const TableStyles = styled.div`
     }
   }
 
-  table td.status,table td.date,table td.version,table td.appType {
+  table td.status,table td.date,table td.version {
     text-align: center
 `;
+
+const versionStatus = [
+  "init",
+  "received",
+  "review",
+  "review",
+  "review",
+  "published",
+];
+
+const Columns = [
+  {
+    Header: "Id",
+    accessor: "id",
+  },
+  {
+    Header: "Type",
+    accessor: "appType",
+  },
+  {
+    Header: "Name",
+    accessor: "name",
+  },
+  {
+    Header: "Title",
+    accessor: "title",
+  },
+  {
+    Header: "Status",
+    accessor: "status",
+    className: "status",
+    Cell: cellProp => versionStatus[cellProp.row.values.status],
+  },
+  {
+    Header: "Version",
+    accessor: "nextVersion",
+    className: "version",
+  },
+  {
+    Header: "Modified",
+    accessor: "modifiedAt",
+    className: "date",
+  },
+];
 
 // Create a default prop getter
 const defaultPropGetter = () => ({});
@@ -137,145 +173,50 @@ function Table({
   );
 }
 
-const Content = ({ data, currentUser }) => {
-  const history = useHistory();
+const Content = ({ data }) => {
+  //console.log("CURRENT USER ", currentUser);
 
-  const versionStatus = [
-    "init",
-    "received",
-    "review",
-    "review",
-    "review",
-    "published",
-  ];
+  //console.log("TABLE DATA ", data, Object.keys(data));
 
-  const appTypes = ["Widget", "App"];
-
-  const Columns = [
-    {
-      Header: "Id",
-      accessor: "id",
-    },
-    {
-      Header: "Type",
-      accessor: "appType",
-      className: "appType",
-      Cell: cellProp => appTypes[cellProp.row.values.appType],
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-    },
-    {
-      Header: "Title",
-      accessor: "title",
-    },
-    {
-      Header: "Status",
-      accessor: "status",
-      className: "status",
-      Cell: cellProp => versionStatus[cellProp.row.values.status],
-    },
-    {
-      Header: "Version",
-      accessor: "version",
-      className: "version",
-    },
-    {
-      Header: "Modified",
-      accessor: "modifiedAt",
-      className: "date",
-    },
-    {
-      Header: () => null, // No header
-      id: "sendApp", // It needs an ID
-      Cell: cellProp => {
-        //console.log("ROW ", cellProp);
-        return (
-          <Button
-            variation={"link"}
-            onClick={e => {
-              console.log(cellProp.row.values);
-              sendClick(cellProp.row.values);
-            }}
-          >
-            Send
-          </Button>
-        );
-      },
-    },
-  ];
-
-  const [upload, setUpload] = useState(false);
-  const selectedRow = useRef({});
-
-  const sendClick = row => {
-    selectedRow.current = row;
-    setUpload(true);
-  };
-
-  const closeClick = (fileUploaded = false, version) => {
-    if (fileUploaded) {
-      addAppVersionMutation(API, {
-        id: selectedRow.current.id,
-        nextVersion: version,
-        status: 1, //received
-      }).then(res => {
-        setUpload(false);
-      });
-    } else {
-      setUpload(false);
-    }
-  };
   return (
     <React.Fragment>
-      <StyledBox>
-        <PrifinaLogo />
-        {upload && <UploadApp row={selectedRow.current} close={closeClick} />}
-        {!upload && (
-          <>
-            <Box mt={20} pl={"1rem"}>
-              <Button
-                onClick={() => {
-                  history.push("/new-app");
-                }}
-              >
-                New App
-              </Button>
-            </Box>
-            <TableStyles>
-              <div className="tableWrap">
-                {data.length === 0 && <Text m={2}>"No apps..."</Text>}
-                {data.length > 0 && <Table columns={Columns} data={data} />}
-              </div>
-            </TableStyles>
-          </>
-        )}
-      </StyledBox>
+      <div>ADMIN...</div>
+      <TableStyles>
+        <div className="tableWrap">
+          {data.length === 0 && <Text m={2}>"No apps..."</Text>}
+          {data.length > 0 && <Table columns={Columns} data={data} />}
+        </div>
+      </TableStyles>
     </React.Fragment>
   );
 };
 
-const Home = props => {
+const Admin = props => {
   const history = useHistory();
   const { userAuth, currentUser, isAuthenticated, mobileApp } = useAppContext();
 
-  console.log("HOME ", currentUser);
+  console.log("ADMIN ", currentUser);
+
+  const userData = useRef(null);
 
   const [initClient, setInitClient] = useState(false);
+  const activeUser = useRef({});
 
-  const isMountedRef = useIsMountedRef();
   const apps = useRef([]);
+  const isMountedRef = useIsMountedRef();
 
   useEffect(() => {
     async function fetchData() {
       if (isMountedRef.current) {
-        const prifinaApps = await listAppsQuery(API, {
-          filter: { prifinaId: { eq: currentUser.prifinaID } },
-        });
+        const prifinaApps = await listAppsQuery(API, {});
         console.log("APPS ", prifinaApps.data);
         apps.current = prifinaApps.data.listApps.items;
-
+        /*
+        await newAppVersionMutation(API, "testing", "prifinaID", {
+          name: "name",
+          version: "0.0.0",
+        });
+        */
         console.log("APPS ", prifinaApps.data);
 
         setInitClient(true);
@@ -288,14 +229,16 @@ const Home = props => {
 
   return (
     <>
-      {initClient && <Content data={apps.current} currentUser={currentUser} />}
+      {initClient && <Content data={apps.current} />}
       {!initClient && (
-        <div>Home {isAuthenticated ? "Authenticated" : "Unauthenticated"} </div>
+        <div>
+          Admin {isAuthenticated ? "Authenticated" : "Unauthenticated"}{" "}
+        </div>
       )}
     </>
   );
 };
 
-Home.displayName = "Home";
+Admin.displayName = "Admin";
 
-export default withUsermenu()(Home);
+export default Admin;
